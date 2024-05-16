@@ -33,7 +33,7 @@ pyfair with your Python installation, you can run:
 
 .. code-block:: python
 
-    pip install pyfair
+    pip install git+ssh://git@github.com/kenichi-shibata/pyfair
 
 Documentation
 -------------
