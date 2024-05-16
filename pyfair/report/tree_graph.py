@@ -2,7 +2,9 @@
 
 import pandas as pd
 
+import matplotlib
 import matplotlib.pyplot as plt
+
 from matplotlib.patches import Patch
 from matplotlib.patches import Rectangle
 from matplotlib.collections import PatchCollection
@@ -40,8 +42,8 @@ class FairTreeGraph(object):
             'Secondary Loss'                : ['SL'  , 7800,  800, 6600, 1600],
             'Secondary Loss Event Frequency': ['SLEF', 7200,    0, 7800,  800],
             'Secondary Loss Event Magnitude': ['SLEM', 8400,    0, 7800,  800],
-        }, 
-        orient='index', 
+        },
+        orient='index',
         columns=['tag', 'self_x', 'self_y', 'parent_x', 'parent_y']
     )
 
@@ -51,7 +53,7 @@ class FairTreeGraph(object):
         self._format_strings = format_strings
         # Calculate mean and standard deviation for results
         self._result_summary = pd.DataFrame({
-            'μ': self._results.mean(axis=1), 
+            'μ': self._results.mean(axis=1),
             'σ': self._results.std(axis=1),
             '↑': self._results.max(axis=1),
         })
@@ -107,74 +109,78 @@ class FairTreeGraph(object):
         return ax
 
     def _generate_text(self, row, ax):
-        """Apply-able function to gnereate text in rectangles"""
+        """Apply-able function to generate text in rectangles"""
         # Draw header
         plt.text(
-            row['self_x'] + 500, 
-            row['self_y'] + 370, 
-            row['tag'], 
-            horizontalalignment='center',
+            row["self_x"] + 500,
+            row["self_y"] + 370,
+            row["tag"],
+            horizontalalignment="center",
             fontsize=14,
-            fontweight='bold',
+            fontweight="bold",
         )
+
         # Draw data
-        fmt = row['formatter']
+        fmt = row["formatter"]
+
         # Set conditions
-        calculated = row['status'] == 'Calculated'
-        supplied = row['status'] == 'Supplied'
+        calculated = row["status"] == "Calculated"
+        supplied = row["status"] == "Supplied"
+
         # Raw inputs will have a list
-        if 'raw' in row.index:
-            if isinstance(row['raw'], list):
-                raw = True
-            else:
-                raw = False
+        if "raw" in row.index:
+            raw = type(row["raw"]) == list
         else:
             raw = False
+
         if calculated:
             # Get rid of items with value
-            data = row.loc[['μ', 'σ', '↑']].dropna()
-            # Get max legnth for justification
+            data = row.loc[["μ", "σ", "↑"]].dropna()
+            # Get max length for justification
             data = data.map(lambda x: fmt.format(x))
             value_just = data.str.len().max()
             # Create output
-            output = '\n'.join([
-                key + '  ' + value.rjust(value_just)
-                for key, value
-                in data.items()
-            ])
+            output = "\n".join(
+                [
+                    key + "  " + value.rjust(value_just)
+                    for key, value in data.items()  # Use items()
+                ]
+            )
         elif supplied:
             # Get rid of value less items and rename
-            data = row.reindex(['high', 'mode', 'low', 'mean', 'stdev'])
-            data.index = ['↑', '-', '↓', 'μ', 'σ']
+            data = row.reindex(["high", "mode", "low", "mean", "stdev"])
+            data.index = ["↑", "-", "↓", "μ", "σ"]
             data = data.dropna()
             # Format string
             data = data.map(lambda x: fmt.format(x))
-            # Get max length of stirng
+            # Get max length of string
             value_just = data.str.len().max()
             # Output format for raw
             if raw:
-                output = '\n'.join([
-                    key + '  ' + value.rjust(value_just)
-                    for key, value
-                    in data.items()
-                ])
-                output = 'Raw input'
-            # And verything else ... so much nesting
+                output = "\n".join(
+                    [
+                        key + "  " + value.rjust(value_just)
+                        for key, value in data.items()  # Use items()
+                    ]
+                )
+                output = "Raw input"
+            # And everything else...so much nesting
             else:
-                output = '\n'.join([
-                    key + '  ' + value.rjust(value_just)
-                    for key, value
-                    in data.items()
-                ])
+                output = "\n".join(
+                    [
+                        key + "  " + value.rjust(value_just)
+                        for key, value in data.items()  # Use items()
+                    ]
+                )
         else:
-            output = ''
+            output = ""
         plt.text(
-            row['self_x'] + 25, 
-            row['self_y'] + 50, 
+            row["self_x"] + 25,
+            row["self_y"] + 50,
             output,
-            horizontalalignment='left',
+            horizontalalignment="left",
             fontsize=8,
-            fontfamily='monospace'
+            fontfamily="monospace",
         )
 
     def _generate_lines(self, row, ax):
@@ -182,14 +188,14 @@ class FairTreeGraph(object):
         if (row['color'] != 'grey') and row.name != 'Risk':
             ax.annotate(
                 None,
-                xy=(row['parent_x'] + 500, row['parent_y']), 
-                xytext=(row['self_x'] + 500, row['self_y'] + 500),     
+                xy=(row['parent_x'] + 500, row['parent_y']),
+                xytext=(row['self_x'] + 500, row['self_y'] + 500),
                 arrowprops=dict(
                     arrowstyle="-",
                     connectionstyle="angle3,angleA=0,angleB=-90",
                     ec=row['color'],
                     alpha=.3,
-                    linestyle='--', 
+                    linestyle='--',
                     linewidth=3
                 ),
             )

@@ -57,7 +57,7 @@ class FairExceedenceCurves(FairBaseCurve):
     def _get_loss_data(self, space, risk):
         """Get percentage of values under loss value for each value"""
         loss_ex = space.map(lambda value: (value < risk).mean())
-        return (space, loss_ex * 100)    
+        return (space, loss_ex * 100)
 
     def _generate_prob_curve(self, name, ax, quantiles, space):
         """For each percentile, what is the expected loss?"""
@@ -72,13 +72,20 @@ class FairExceedenceCurves(FairBaseCurve):
 
     def _generate_loss_curve(self, name, ax, space, loss_expectancy):
         """For each dollar amount, what's the probability loss was exceeded?"""
+
         # Plot
         ax.plot(space, loss_expectancy)
+
         # Style
-        ax.axes.yaxis.set_major_formatter(StrMethodFormatter('{x:,.0f}%'))
-        ax.axes.xaxis.set_major_formatter(StrMethodFormatter(self._currency_prefix + '{x:,.0f}'))
-        ax.axes.xaxis.set_tick_params(rotation=-45)
-        ax.axes.xaxis.set_tick_params(left = 'true')
-        for tick in ax.axes.xaxis.get_major_ticks():
-            tick.label1.set_horizontalalignment('left')
-        ax.axes.set_title('Loss Exceedence Curve', fontsize=20)
+        ax.axes.yaxis.set_major_formatter(StrMethodFormatter("{x:,.0f}%"))
+        ax.axes.xaxis.set_major_formatter(
+            StrMethodFormatter(self._currency_prefix + "{x:,.0f}")
+        )
+
+        # Update: Correctly align x-axis labels
+        ax.tick_params(axis='x', rotation=-45)
+        for label in ax.get_xticklabels():  # Get labels directly
+            label.set_horizontalalignment("right")  # Set alignment
+
+        ax.axes.set_title("Loss Exceedence Curve", fontsize=20)
+

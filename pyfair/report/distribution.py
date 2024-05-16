@@ -21,13 +21,13 @@ class FairDistributionCurve(FairBaseCurve):
 
     Parameters
     ----------
-    model_or_iterable : FairModel, FairMetaModel, or list of 
+    model_or_iterable : FairModel, FairMetaModel, or list of
     FairModels/FairMetaModels
 
     Examples
     --------
     >>> m = pyfair.model.FairModel.from_json('model_1.json')
-    >>> dc = pyfair.report.FairDistributionCurve(m) 
+    >>> dc = pyfair.report.FairDistributionCurve(m)
 
     """
     def __init__(self, model_or_iterable, currency_prefix='$'):
@@ -103,14 +103,18 @@ class FairDistributionCurve(FairBaseCurve):
         ax.axes.xaxis.set_major_formatter(StrMethodFormatter(self._currency_prefix + '{x:,.0f}'))
         ax.axes.xaxis.set_tick_params(rotation=-45)
         ax.set_ylabel('Frequency Histogram')
-        for tick in ax.axes.xaxis.get_major_ticks():
-            tick.label1.set_horizontalalignment('left')
-        # Draw histrogram for each model
+        #for tick in ax.axes.xaxis.get_major_ticks():
+        #    tick.label.set_horizontalalignment('left')
+        ax.tick_params(axis='x', rotation=45)
+        # Set horizontal alignment directly for the labels
+        for label in ax.get_xticklabels():
+            label.set_horizontalalignment('right')
+
         legend_labels = []
         for name, model in self._input.items():
             legend_labels.append(name)
             plt.hist(
-                [model.export_results()['Risk']], 
+                [model.export_results()['Risk']],
                 bins=25,
                 alpha=.3
             )
